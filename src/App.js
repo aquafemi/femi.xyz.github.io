@@ -8,12 +8,13 @@ import DesktopIcons from './components/DesktopIcons';
 
 function App() {
   const [activeWindows, setActiveWindows] = useState({
-    home: { isOpen: true, isMinimized: false, isMaximized: false, zIndex: 1 },
-    about: { isOpen: false, isMinimized: false, isMaximized: false, zIndex: 0 },
-    contact: { isOpen: false, isMinimized: false, isMaximized: false, zIndex: 0 }
+    home: { isOpen: true, isMinimized: false, isMaximized: false, zIndex: 1, order: 0 },
+    about: { isOpen: false, isMinimized: false, isMaximized: false, zIndex: 0, order: -1 },
+    contact: { isOpen: false, isMinimized: false, isMaximized: false, zIndex: 0, order: -1 }
   });
   const [minimizedWindows, setMinimizedWindows] = useState([]);
   const [highestZIndex, setHighestZIndex] = useState(1);
+  const [windowOrder, setWindowOrder] = useState(1);
 
   // Window management functions
   const bringToFront = (windowKey) => {
@@ -32,12 +33,19 @@ function App() {
   const handleOpen = (windowKey, title, icon) => {
     bringToFront(windowKey);
     
+    // Assign next order number only if window is not already open
+    const newOrder = !activeWindows[windowKey].isOpen ? windowOrder : activeWindows[windowKey].order;
+    if (!activeWindows[windowKey].isOpen) {
+      setWindowOrder(prev => prev + 1);
+    }
+    
     setActiveWindows(prev => ({
       ...prev,
       [windowKey]: {
         ...prev[windowKey],
         isOpen: true,
-        isMinimized: false
+        isMinimized: false,
+        order: newOrder
       }
     }));
   };
@@ -49,7 +57,8 @@ function App() {
         id: Math.random().toString(36).substring(7),
         key: windowKey, 
         title, 
-        icon 
+        icon,
+        order: activeWindows[windowKey].order // Preserve order for sorting
       }]);
     }
     
@@ -128,7 +137,8 @@ function App() {
           key,
           title,
           icon,
-          isMinimized: false
+          isMinimized: false,
+          order: window.order
         });
       }
     });
@@ -141,7 +151,9 @@ function App() {
       });
     });
     
-    return items;
+    // Sort items by their order (when they were opened)
+    // Lower orders (older windows) come first
+    return items.sort((a, b) => a.order - b.order);
   };
 
   return (
