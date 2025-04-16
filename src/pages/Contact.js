@@ -2,18 +2,13 @@ import React, { useState } from 'react';
 import DraggableWindow from '../components/DraggableWindow';
 import { useNavigate } from 'react-router-dom';
 
-function Contact() {
+function Contact({ isMinimized, isMaximized, onMinimize, onMaximize, onClose }) {
   const navigate = useNavigate();
-  const [showWindow, setShowWindow] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     message: ''
   });
-
-  const handleClose = () => {
-    setShowWindow(false);
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -33,14 +28,17 @@ function Contact() {
     });
   };
 
-  if (!showWindow) {
+  if (isMinimized) {
     return null;
   }
 
   return (
     <DraggableWindow 
       title="Contact Me - My Portfolio" 
-      onClose={handleClose}
+      onClose={onClose}
+      onMinimize={onMinimize}
+      onMaximize={onMaximize}
+      isMaximized={isMaximized}
       defaultPosition={{ x: '30%', y: '20%' }}
     >
       <div className="window-body">

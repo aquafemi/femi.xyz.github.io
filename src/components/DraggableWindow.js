@@ -1,14 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-function DraggableWindow({ title, children, onClose, defaultPosition = { x: '15%', y: '15%' }, width = '70%' }) {
+function DraggableWindow({ title, children, onClose, onMinimize, onMaximize, isMaximized, defaultPosition = { x: '15%', y: '15%' }, width = '70%' }) {
   const [position, setPosition] = useState(defaultPosition);
+  const [previousPosition, setPreviousPosition] = useState(defaultPosition);
   const [isDragging, setIsDragging] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const windowRef = useRef(null);
 
   const handleMouseDown = (e) => {
     // Only allow dragging from the title bar
-    if (e.target.closest('.title-bar')) {
+    if (e.target.closest('.title-bar') && !isMaximized) {
       setIsDragging(true);
       setOffset({
         x: e.clientX - windowRef.current.getBoundingClientRect().left,
@@ -42,6 +43,17 @@ function DraggableWindow({ title, children, onClose, defaultPosition = { x: '15%
     setIsDragging(false);
   };
 
+  const handleMaximize = () => {
+    if (isMaximized) {
+      // Restore to previous position
+      onMaximize(false);
+    } else {
+      // Save current position before maximizing
+      setPreviousPosition(position);
+      onMaximize(true);
+    }
+  };
+
   // Add global mouse event listeners
   useEffect(() => {
     if (isDragging) {
@@ -61,20 +73,21 @@ function DraggableWindow({ title, children, onClose, defaultPosition = { x: '15%
       ref={windowRef}
       style={{ 
         position: 'absolute',
-        left: position.x,
-        top: position.y,
-        width: width,
+        left: isMaximized ? 0 : position.x,
+        top: isMaximized ? 0 : position.y,
+        width: isMaximized ? '100%' : width,
+        height: isMaximized ? 'calc(100vh - 40px)' : 'auto',
         margin: 0,
         zIndex: isDragging ? 1000 : 1,
         cursor: isDragging ? 'grabbing' : 'default'
       }}
       onMouseDown={handleMouseDown}
     >
-      <div className="title-bar" style={{ cursor: 'grab' }}>
+      <div className="title-bar" style={{ cursor: isMaximized ? 'default' : 'grab' }}>
         <div className="title-bar-text">{title}</div>
         <div className="title-bar-controls">
-          <button aria-label="Minimize"></button>
-          <button aria-label="Maximize"></button>
+          <button aria-label="Minimize" onClick={onMinimize}></button>
+          <button aria-label="Maximize" onClick={handleMaximize}></button>
           <button aria-label="Close" onClick={onClose}></button>
         </div>
       </div>

@@ -2,22 +2,20 @@ import React, { useState } from 'react';
 import DraggableWindow from '../components/DraggableWindow';
 import { useNavigate } from 'react-router-dom';
 
-function About() {
+function About({ isMinimized, isMaximized, onMinimize, onMaximize, onClose }) {
   const navigate = useNavigate();
-  const [showWindow, setShowWindow] = useState(true);
 
-  const handleClose = () => {
-    setShowWindow(false);
-  };
-
-  if (!showWindow) {
+  if (isMinimized) {
     return null;
   }
 
   return (
     <DraggableWindow 
       title="About Me - My Portfolio" 
-      onClose={handleClose}
+      onClose={onClose}
+      onMinimize={onMinimize}
+      onMaximize={onMaximize}
+      isMaximized={isMaximized}
       defaultPosition={{ x: '25%', y: '15%' }}
     >
       <div className="window-body">

@@ -3,22 +3,20 @@ import logo from '../logo.svg';
 import DraggableWindow from '../components/DraggableWindow';
 import { useNavigate } from 'react-router-dom';
 
-function Home() {
+function Home({ isMinimized, isMaximized, onMinimize, onMaximize, onClose }) {
   const navigate = useNavigate();
-  const [showWindow, setShowWindow] = useState(true);
 
-  const handleClose = () => {
-    setShowWindow(false);
-  };
-
-  if (!showWindow) {
+  if (isMinimized) {
     return null;
   }
 
   return (
     <DraggableWindow 
       title="Home - My Portfolio" 
-      onClose={handleClose}
+      onClose={onClose}
+      onMinimize={onMinimize}
+      onMaximize={onMaximize}
+      isMaximized={isMaximized}
       defaultPosition={{ x: '15%', y: '10%' }}
     >
       <div className="window-body">
