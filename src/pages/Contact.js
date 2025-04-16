@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
+import DraggableWindow from '../components/DraggableWindow';
+import { useNavigate } from 'react-router-dom';
 
 function Contact() {
+  const navigate = useNavigate();
+  const [showWindow, setShowWindow] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     message: ''
   });
+
+  const handleClose = () => {
+    setShowWindow(false);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,16 +33,16 @@ function Contact() {
     });
   };
 
+  if (!showWindow) {
+    return null;
+  }
+
   return (
-    <div className="window" style={{ width: '70%', margin: '40px auto' }}>
-      <div className="title-bar">
-        <div className="title-bar-text">Contact Me - My Portfolio</div>
-        <div className="title-bar-controls">
-          <button aria-label="Minimize"></button>
-          <button aria-label="Maximize"></button>
-          <button aria-label="Close"></button>
-        </div>
-      </div>
+    <DraggableWindow 
+      title="Contact Me - My Portfolio" 
+      onClose={handleClose}
+      defaultPosition={{ x: '30%', y: '20%' }}
+    >
       <div className="window-body">
         <div className="content">
           <h1>Contact Me</h1>
@@ -76,7 +84,7 @@ function Contact() {
             </div>
             <div className="field-row" style={{ justifyContent: 'center', marginTop: '20px' }}>
               <button type="submit">Send Message</button>
-              <button type="button" onClick={() => window.location.href = '/'}>Back to Home</button>
+              <button type="button" onClick={() => navigate('/')}>Back to Home</button>
             </div>
           </form>
         </div>
@@ -86,7 +94,7 @@ function Contact() {
         <div className="status-bar-field">CPU Usage: 18%</div>
         <div className="status-bar-field">My Documents</div>
       </div>
-    </div>
+    </DraggableWindow>
   );
 }
 

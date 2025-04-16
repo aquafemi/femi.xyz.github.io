@@ -1,11 +1,20 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function DesktopIcons() {
   const navigate = useNavigate();
+  const location = useLocation();
 
+  // Function to reopen windows that have been closed
   const handleIconClick = (path) => {
-    navigate(path);
+    // Only navigate if we're not already on this page
+    // This forces a component remount to reopen the window
+    if (location.pathname === path) {
+      navigate('/', { replace: true });
+      setTimeout(() => navigate(path, { replace: true }), 10);
+    } else {
+      navigate(path);
+    }
   };
 
   return (

@@ -17,10 +17,8 @@ body {
 }
 
 .window {
-  margin: 0 auto;
-  max-width: 800px;
-  position: relative;
-  width: 90%;
+  position: absolute;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 .taskbar {

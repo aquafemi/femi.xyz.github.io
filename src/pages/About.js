@@ -1,16 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
+import DraggableWindow from '../components/DraggableWindow';
+import { useNavigate } from 'react-router-dom';
 
 function About() {
+  const navigate = useNavigate();
+  const [showWindow, setShowWindow] = useState(true);
+
+  const handleClose = () => {
+    setShowWindow(false);
+  };
+
+  if (!showWindow) {
+    return null;
+  }
+
   return (
-    <div className="window" style={{ width: '70%', margin: '40px auto' }}>
-      <div className="title-bar">
-        <div className="title-bar-text">About Me - My Portfolio</div>
-        <div className="title-bar-controls">
-          <button aria-label="Minimize"></button>
-          <button aria-label="Maximize"></button>
-          <button aria-label="Close"></button>
-        </div>
-      </div>
+    <DraggableWindow 
+      title="About Me - My Portfolio" 
+      onClose={handleClose}
+      defaultPosition={{ x: '25%', y: '15%' }}
+    >
       <div className="window-body">
         <div className="content">
           <h1>About Me</h1>
@@ -26,8 +35,8 @@ function About() {
             <p>When I'm not coding, I enjoy hiking, reading, and playing video games.</p>
           </div>
           <div className="field-row" style={{ justifyContent: 'center', marginTop: '20px' }}>
-            <button onClick={() => window.location.href = '/'}>Home</button>
-            <button onClick={() => window.location.href = '/contact'}>Contact</button>
+            <button onClick={() => navigate('/')}>Home</button>
+            <button onClick={() => navigate('/contact')}>Contact</button>
           </div>
         </div>
       </div>
@@ -36,7 +45,7 @@ function About() {
         <div className="status-bar-field">CPU Usage: 22%</div>
         <div className="status-bar-field">My Documents</div>
       </div>
-    </div>
+    </DraggableWindow>
   );
 }
 
