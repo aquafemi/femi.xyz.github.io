@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import logo from '../logo.svg';
 import DraggableWindow from '../components/DraggableWindow';
 import { useNavigate } from 'react-router-dom';
 
-function Home({ isMinimized, isMaximized, onMinimize, onMaximize, onClose }) {
+function Home({ isMinimized, isMaximized, zIndex, onMinimize, onMaximize, onClose, onFocus }) {
   const navigate = useNavigate();
 
   if (isMinimized) {
@@ -18,6 +18,8 @@ function Home({ isMinimized, isMaximized, onMinimize, onMaximize, onClose }) {
       onMaximize={onMaximize}
       isMaximized={isMaximized}
       defaultPosition={{ x: '15%', y: '10%' }}
+      zIndex={zIndex}
+      onFocus={onFocus}
     >
       <div className="window-body">
         <div className="content">

@@ -1,11 +1,29 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-function DraggableWindow({ title, children, onClose, onMinimize, onMaximize, isMaximized, defaultPosition = { x: '15%', y: '15%' }, width = '70%' }) {
+function DraggableWindow({ 
+  title, 
+  children, 
+  onClose, 
+  onMinimize, 
+  onMaximize, 
+  onFocus,
+  isMaximized,
+  zIndex = 1, 
+  defaultPosition = { x: '15%', y: '15%' }, 
+  width = '70%' 
+}) {
   const [position, setPosition] = useState(defaultPosition);
   const [previousPosition, setPreviousPosition] = useState(defaultPosition);
   const [isDragging, setIsDragging] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const windowRef = useRef(null);
+
+  // Bring window to front when clicked
+  const handleWindowClick = (e) => {
+    if (!isDragging) {
+      onFocus();
+    }
+  };
 
   const handleMouseDown = (e) => {
     // Only allow dragging from the title bar
@@ -15,6 +33,7 @@ function DraggableWindow({ title, children, onClose, onMinimize, onMaximize, isM
         x: e.clientX - windowRef.current.getBoundingClientRect().left,
         y: e.clientY - windowRef.current.getBoundingClientRect().top
       });
+      onFocus();
     }
   };
 
@@ -78,12 +97,16 @@ function DraggableWindow({ title, children, onClose, onMinimize, onMaximize, isM
         width: isMaximized ? '100%' : width,
         height: isMaximized ? 'calc(100vh - 40px)' : 'auto',
         margin: 0,
-        zIndex: isDragging ? 1000 : 1,
+        zIndex: zIndex,
         cursor: isDragging ? 'grabbing' : 'default'
       }}
-      onMouseDown={handleMouseDown}
+      onMouseDown={handleWindowClick}
     >
-      <div className="title-bar" style={{ cursor: isMaximized ? 'default' : 'grab' }}>
+      <div 
+        className="title-bar" 
+        style={{ cursor: isMaximized ? 'default' : 'grab' }}
+        onMouseDown={handleMouseDown}
+      >
         <div className="title-bar-text">{title}</div>
         <div className="title-bar-controls">
           <button aria-label="Minimize" onClick={onMinimize}></button>

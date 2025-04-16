@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import DraggableWindow from '../components/DraggableWindow';
 import { useNavigate } from 'react-router-dom';
 
-function Contact({ isMinimized, isMaximized, onMinimize, onMaximize, onClose }) {
+function Contact({ isMinimized, isMaximized, zIndex, onMinimize, onMaximize, onClose, onFocus }) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
@@ -40,6 +40,8 @@ function Contact({ isMinimized, isMaximized, onMinimize, onMaximize, onClose }) 
       onMaximize={onMaximize}
       isMaximized={isMaximized}
       defaultPosition={{ x: '30%', y: '20%' }}
+      zIndex={zIndex}
+      onFocus={onFocus}
     >
       <div className="window-body">
         <div className="content">

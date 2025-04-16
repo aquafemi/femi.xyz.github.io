@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import DraggableWindow from '../components/DraggableWindow';
 import { useNavigate } from 'react-router-dom';
 
-function About({ isMinimized, isMaximized, onMinimize, onMaximize, onClose }) {
+function About({ isMinimized, isMaximized, zIndex, onMinimize, onMaximize, onClose, onFocus }) {
   const navigate = useNavigate();
 
   if (isMinimized) {
@@ -17,6 +17,8 @@ function About({ isMinimized, isMaximized, onMinimize, onMaximize, onClose }) {
       onMaximize={onMaximize}
       isMaximized={isMaximized}
       defaultPosition={{ x: '25%', y: '15%' }}
+      zIndex={zIndex}
+      onFocus={onFocus}
     >
       <div className="window-body">
         <div className="content">

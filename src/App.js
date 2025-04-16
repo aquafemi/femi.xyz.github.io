@@ -1,4 +1,3 @@
-import { Routes, Route, useLocation } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import Home from './pages/Home';
@@ -8,54 +7,82 @@ import Navbar from './components/Navbar';
 import DesktopIcons from './components/DesktopIcons';
 
 function App() {
-  const location = useLocation();
-  const [minimizedWindows, setMinimizedWindows] = useState([]);
-  const [windowStates, setWindowStates] = useState({
-    '/': { isMinimized: false, isMaximized: false },
-    '/about': { isMinimized: false, isMaximized: false },
-    '/contact': { isMinimized: false, isMaximized: false }
+  const [activeWindows, setActiveWindows] = useState({
+    home: { isOpen: true, isMinimized: false, isMaximized: false, zIndex: 1 },
+    about: { isOpen: false, isMinimized: false, isMaximized: false, zIndex: 0 },
+    contact: { isOpen: false, isMinimized: false, isMaximized: false, zIndex: 0 }
   });
+  const [minimizedWindows, setMinimizedWindows] = useState([]);
+  const [highestZIndex, setHighestZIndex] = useState(1);
 
   // Window management functions
-  const handleMinimize = (path, title, icon) => {
+  const bringToFront = (windowKey) => {
+    const newZIndex = highestZIndex + 1;
+    setHighestZIndex(newZIndex);
+    
+    setActiveWindows(prev => ({
+      ...prev,
+      [windowKey]: {
+        ...prev[windowKey],
+        zIndex: newZIndex
+      }
+    }));
+  };
+
+  const handleOpen = (windowKey, title, icon) => {
+    bringToFront(windowKey);
+    
+    setActiveWindows(prev => ({
+      ...prev,
+      [windowKey]: {
+        ...prev[windowKey],
+        isOpen: true,
+        isMinimized: false
+      }
+    }));
+  };
+
+  const handleMinimize = (windowKey, title, icon) => {
     // Add window to minimized windows if not already there
-    if (!minimizedWindows.some(window => window.path === path)) {
+    if (!minimizedWindows.some(window => window.key === windowKey)) {
       setMinimizedWindows([...minimizedWindows, { 
         id: Math.random().toString(36).substring(7),
-        path, 
+        key: windowKey, 
         title, 
         icon 
       }]);
     }
     
     // Update window state
-    setWindowStates(prev => ({
+    setActiveWindows(prev => ({
       ...prev,
-      [path]: { 
-        ...prev[path],
+      [windowKey]: { 
+        ...prev[windowKey],
         isMinimized: true 
       }
     }));
   };
 
-  const handleMaximize = (path, isMaximized) => {
-    setWindowStates(prev => ({
+  const handleMaximize = (windowKey, isMaximized) => {
+    setActiveWindows(prev => ({
       ...prev,
-      [path]: { 
-        ...prev[path],
+      [windowKey]: { 
+        ...prev[windowKey],
         isMaximized
       }
     }));
   };
 
-  const handleClose = (path) => {
+  const handleClose = (windowKey) => {
     // Remove from minimized windows
-    setMinimizedWindows(minimizedWindows.filter(window => window.path !== path));
+    setMinimizedWindows(minimizedWindows.filter(window => window.key !== windowKey));
     
     // Update window state
-    setWindowStates(prev => ({
+    setActiveWindows(prev => ({
       ...prev,
-      [path]: { 
+      [windowKey]: { 
+        ...prev[windowKey],
+        isOpen: false,
         isMinimized: false,
         isMaximized: false 
       }
@@ -65,11 +92,13 @@ function App() {
   const handleRestoreWindow = (id) => {
     const window = minimizedWindows.find(window => window.id === id);
     if (window) {
+      bringToFront(window.key);
+      
       // Update window state to not minimized
-      setWindowStates(prev => ({
+      setActiveWindows(prev => ({
         ...prev,
-        [window.path]: { 
-          ...prev[window.path],
+        [window.key]: { 
+          ...prev[window.key],
           isMinimized: false 
         }
       }));
@@ -79,55 +108,50 @@ function App() {
     }
   };
 
-  useEffect(() => {
-    // Reset minimized state when navigating to a new route
-    const currentPath = location.pathname;
-    setWindowStates(prev => ({
-      ...prev,
-      [currentPath]: { 
-        ...prev[currentPath],
-        isMinimized: false 
-      }
-    }));
-  }, [location.pathname]);
-
   return (
     <div className="App">
-      <DesktopIcons />
+      <DesktopIcons openWindow={handleOpen} />
       
-      <Routes>
-        <Route path="/" element={
-          <Home 
-            isMinimized={windowStates['/'].isMinimized}
-            isMaximized={windowStates['/'].isMaximized}
-            onMinimize={() => handleMinimize('/', 'Home', 'https://i.imgur.com/O5M1z2p.png')}
-            onMaximize={(isMax) => handleMaximize('/', isMax)}
-            onClose={() => handleClose('/')}
-          />
-        } />
-        <Route path="/about" element={
-          <About 
-            isMinimized={windowStates['/about'].isMinimized}
-            isMaximized={windowStates['/about'].isMaximized}
-            onMinimize={() => handleMinimize('/about', 'About Me', 'https://i.imgur.com/jS1lQxV.png')}
-            onMaximize={(isMax) => handleMaximize('/about', isMax)}
-            onClose={() => handleClose('/about')}
-          />
-        } />
-        <Route path="/contact" element={
-          <Contact 
-            isMinimized={windowStates['/contact'].isMinimized}
-            isMaximized={windowStates['/contact'].isMaximized}
-            onMinimize={() => handleMinimize('/contact', 'Contact', 'https://i.imgur.com/d1iHG1e.png')}
-            onMaximize={(isMax) => handleMaximize('/contact', isMax)}
-            onClose={() => handleClose('/contact')}
-          />
-        } />
-      </Routes>
+      {activeWindows.home.isOpen && (
+        <Home 
+          isMinimized={activeWindows.home.isMinimized}
+          isMaximized={activeWindows.home.isMaximized}
+          zIndex={activeWindows.home.zIndex}
+          onMinimize={() => handleMinimize('home', 'Home', 'https://i.imgur.com/O5M1z2p.png')}
+          onMaximize={(isMax) => handleMaximize('home', isMax)}
+          onClose={() => handleClose('home')}
+          onFocus={() => bringToFront('home')}
+        />
+      )}
+      
+      {activeWindows.about.isOpen && (
+        <About 
+          isMinimized={activeWindows.about.isMinimized}
+          isMaximized={activeWindows.about.isMaximized}
+          zIndex={activeWindows.about.zIndex}
+          onMinimize={() => handleMinimize('about', 'About Me', 'https://i.imgur.com/jS1lQxV.png')}
+          onMaximize={(isMax) => handleMaximize('about', isMax)}
+          onClose={() => handleClose('about')}
+          onFocus={() => bringToFront('about')}
+        />
+      )}
+      
+      {activeWindows.contact.isOpen && (
+        <Contact 
+          isMinimized={activeWindows.contact.isMinimized}
+          isMaximized={activeWindows.contact.isMaximized}
+          zIndex={activeWindows.contact.zIndex}
+          onMinimize={() => handleMinimize('contact', 'Contact', 'https://i.imgur.com/d1iHG1e.png')}
+          onMaximize={(isMax) => handleMaximize('contact', isMax)}
+          onClose={() => handleClose('contact')}
+          onFocus={() => bringToFront('contact')}
+        />
+      )}
       
       <Navbar 
         minimizedWindows={minimizedWindows} 
         handleRestoreWindow={handleRestoreWindow}
+        openWindow={handleOpen}
       />
     </div>
   );

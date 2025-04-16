@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
 
-function Navbar({ minimizedWindows, handleRestoreWindow }) {
-  const navigate = useNavigate();
-  const location = useLocation();
+function Navbar({ minimizedWindows, handleRestoreWindow, openWindow }) {
   const [time, setTime] = useState(new Date().toLocaleTimeString());
   const [startMenuOpen, setStartMenuOpen] = useState(false);
 
@@ -18,8 +15,8 @@ function Navbar({ minimizedWindows, handleRestoreWindow }) {
     setStartMenuOpen(!startMenuOpen);
   };
 
-  const handleStartMenuItemClick = (path) => {
-    navigate(path);
+  const handleStartMenuItemClick = (windowKey, title, icon) => {
+    openWindow(windowKey, title, icon);
     setStartMenuOpen(false);
   };
 
@@ -49,7 +46,7 @@ function Navbar({ minimizedWindows, handleRestoreWindow }) {
           {minimizedWindows.map((window, index) => (
             <div 
               key={index} 
-              className={`taskbar-item ${window.path === location.pathname ? 'active' : ''}`}
+              className="taskbar-item"
               onClick={() => handleRestoreWindow(window.id)}
             >
               <img src={window.icon} alt={window.title} />
@@ -67,15 +64,24 @@ function Navbar({ minimizedWindows, handleRestoreWindow }) {
             <span>User</span>
           </div>
           <div className="start-menu-items">
-            <div className="start-menu-item" onClick={() => handleStartMenuItemClick('/')}>
+            <div 
+              className="start-menu-item" 
+              onClick={() => handleStartMenuItemClick('home', 'Home', 'https://i.imgur.com/O5M1z2p.png')}
+            >
               <img src="https://i.imgur.com/O5M1z2p.png" alt="Home" />
               <span>Home</span>
             </div>
-            <div className="start-menu-item" onClick={() => handleStartMenuItemClick('/about')}>
+            <div 
+              className="start-menu-item" 
+              onClick={() => handleStartMenuItemClick('about', 'About Me', 'https://i.imgur.com/jS1lQxV.png')}
+            >
               <img src="https://i.imgur.com/jS1lQxV.png" alt="About" />
               <span>About Me</span>
             </div>
-            <div className="start-menu-item" onClick={() => handleStartMenuItemClick('/contact')}>
+            <div 
+              className="start-menu-item" 
+              onClick={() => handleStartMenuItemClick('contact', 'Contact', 'https://i.imgur.com/d1iHG1e.png')}
+            >
               <img src="https://i.imgur.com/d1iHG1e.png" alt="Contact" />
               <span>Contact</span>
             </div>
