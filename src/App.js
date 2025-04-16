@@ -108,6 +108,42 @@ function App() {
     }
   };
 
+  // Create a list of all taskbar items (open and minimized windows)
+  const getTaskbarItems = () => {
+    const items = [];
+    
+    // Add all open, non-minimized windows
+    Object.entries(activeWindows).forEach(([key, window]) => {
+      if (window.isOpen && !window.isMinimized) {
+        const title = key === 'home' ? 'Home' : 
+                    key === 'about' ? 'About Me' : 
+                    key === 'contact' ? 'Contact' : key;
+                    
+        const icon = key === 'home' ? 'https://i.imgur.com/O5M1z2p.png' : 
+                    key === 'about' ? 'https://i.imgur.com/jS1lQxV.png' : 
+                    key === 'contact' ? 'https://i.imgur.com/d1iHG1e.png' : '';
+        
+        items.push({
+          id: key,
+          key,
+          title,
+          icon,
+          isMinimized: false
+        });
+      }
+    });
+    
+    // Add all minimized windows
+    minimizedWindows.forEach(window => {
+      items.push({
+        ...window,
+        isMinimized: true
+      });
+    });
+    
+    return items;
+  };
+
   return (
     <div className="App">
       <DesktopIcons openWindow={handleOpen} />
@@ -149,9 +185,10 @@ function App() {
       )}
       
       <Navbar 
-        minimizedWindows={minimizedWindows} 
+        taskbarItems={getTaskbarItems()}
         handleRestoreWindow={handleRestoreWindow}
         openWindow={handleOpen}
+        bringToFront={bringToFront}
       />
     </div>
   );

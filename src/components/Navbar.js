@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-function Navbar({ minimizedWindows, handleRestoreWindow, openWindow }) {
+function Navbar({ taskbarItems, handleRestoreWindow, openWindow, bringToFront }) {
   const [time, setTime] = useState(new Date().toLocaleTimeString());
   const [startMenuOpen, setStartMenuOpen] = useState(false);
 
@@ -18,6 +18,14 @@ function Navbar({ minimizedWindows, handleRestoreWindow, openWindow }) {
   const handleStartMenuItemClick = (windowKey, title, icon) => {
     openWindow(windowKey, title, icon);
     setStartMenuOpen(false);
+  };
+
+  const handleTaskbarItemClick = (item) => {
+    if (item.isMinimized) {
+      handleRestoreWindow(item.id);
+    } else {
+      bringToFront(item.key);
+    }
   };
 
   // Close start menu when clicking outside
@@ -43,14 +51,14 @@ function Navbar({ minimizedWindows, handleRestoreWindow, openWindow }) {
         </div>
         
         <div className="taskbar-items">
-          {minimizedWindows.map((window, index) => (
+          {taskbarItems.map((item, index) => (
             <div 
               key={index} 
-              className="taskbar-item"
-              onClick={() => handleRestoreWindow(window.id)}
+              className={`taskbar-item ${item.isMinimized ? '' : 'active'}`}
+              onClick={() => handleTaskbarItemClick(item)}
             >
-              <img src={window.icon} alt={window.title} />
-              <span>{window.title}</span>
+              <img src={item.icon} alt={item.title} />
+              <span>{item.title}</span>
             </div>
           ))}
         </div>
